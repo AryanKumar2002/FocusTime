@@ -13,7 +13,7 @@
       "tabs"],
     "web_accessible_resources": [
       {
-        "resources": ["popup.html", "pomodoro.html"],
+        "resources": ["popup.html", "pomodoro.html", "tasktracker.html", "dashboard.html"],
         "matches": ["<all_urls>"]
       }
     ],
@@ -23,15 +23,15 @@
     "action": {
       "default_popup": "menu.html",
       "default_icon": {
-        "16": "images/icon.png",
-        "48": "images/icon.png",
-        "128": "images/icon.png"
+        "16": "icon.png",
+        "48": "icon.png",
+        "128": "icon.png"
       }
     },
     "icons": {
-      "16": "images/icon.png",
-      "48": "images/icon.png",
-      "128": "images/icon.png"
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
     }
   }
   

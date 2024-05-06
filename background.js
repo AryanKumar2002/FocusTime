@@ -32,7 +32,7 @@ function startTimer(duration, type) {
             notifText = timerType === "work" ? "Time to get back to work!" : "Time to take a break!";
             chrome.notifications.create({
                 type: 'basic',
-                iconUrl: 'images/icon.png', // Path to the icon
+                iconUrl: 'icon.png', // Path to the icon
                 title: notifTitle,
                 message: notifText
             });
@@ -79,7 +79,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         if (state == "Stop" && pause == "Pause") {
             chrome.notifications.create({
                 type: 'basic',
-                iconUrl: 'images/icon.png',
+                iconUrl: 'icon.png',
                 title: "Blocked Website!",
                 message: "You are visiting a blocked site during work time."
             });
