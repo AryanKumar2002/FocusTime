@@ -68,22 +68,21 @@ chrome.runtime.onInstalled.addListener(() => {
     chrome.storage.local.set({isPaused: false});
 });
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     if (changeInfo.status === 'complete') {
-      console.log("Visited URL:", tab.url);
-    }
-  
-    const blockedUrl = "youtube.com";
-    if (tab.url.includes(blockedUrl)) {
-        console.log("Visited Blocked Site");
-        if (state == "Stop" && pause == "Pause") {
-            chrome.notifications.create({
-                type: 'basic',
-                iconUrl: 'icon.png',
-                title: "Blocked Website!",
-                message: "You are visiting a blocked site during work time."
+        chrome.storage.local.get({blockedWebsites: []}, function(result) {
+            const blockedWebsites = result.blockedWebsites;
+            blockedWebsites.forEach(function(blockedUrl) {
+                if (tab.url.includes(blockedUrl) && state == "Stop" && pause == "Pause") {
+                    console.log("Blocked website accessed:", blockedUrl);
+                    chrome.notifications.create({
+                        type: 'basic',
+                        iconUrl: 'icon.png',
+                        title: "Blocked Website Alert!",
+                        message: "You are visiting a blocked site: " + blockedUrl
+                    });
+                }
             });
-        }
+        });
     }
-  });
-  
+});

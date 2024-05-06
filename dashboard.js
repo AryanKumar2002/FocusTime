@@ -63,37 +63,65 @@ document.addEventListener('DOMContentLoaded', function() {
     chrome.runtime.sendMessage({request: "currentTimeLeft"});
 });
 
-document.getElementById('addTaskBtn').addEventListener('click', function() {
-    const taskInput = document.getElementById('newTaskInput');
+function updateTaskListUI(tasks) {
     const taskList = document.getElementById('taskList');
-    const task = taskInput.value.trim();
-    if (task) {
+    taskList.innerHTML = '';  // Clear existing tasks
+    tasks.forEach(function(task) {
         const listItem = document.createElement('li');
-        listItem.textContent = task;
+        listItem.textContent = task.description;
+        listItem.style.textDecoration = task.completed ? 'line-through' : 'none';
 
-        // Add a button to mark the task as complete
+        // Button to toggle completion status
         const completeBtn = document.createElement('button');
-        completeBtn.textContent = 'Complete';
-        completeBtn.classList.add('complete-btn');
+        completeBtn.textContent = task.completed ? 'Undo' : 'Complete';
         completeBtn.onclick = function() {
-            listItem.style.textDecoration = 'line-through'; // Strike through the task
+            task.completed = !task.completed;
+            saveTasks(tasks);
         };
 
-        // Add a button to delete the task
+        // Button to delete task
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = 'Delete';
-        deleteBtn.classList.add('delete-task-btn');
         deleteBtn.onclick = function() {
-            taskList.removeChild(listItem);
+            const index = tasks.indexOf(task);
+            tasks.splice(index, 1);
+            saveTasks(tasks);
         };
 
         listItem.appendChild(completeBtn);
         listItem.appendChild(deleteBtn);
         taskList.appendChild(listItem);
-        taskInput.value = ''; // Clear input after adding
+    });
+}
+
+// Function to save tasks to local storage
+function saveTasks(tasks) {
+    chrome.storage.local.set({ tasks: tasks }, function() {
+        updateTaskListUI(tasks);
+    });
+}
+
+// Event listener for adding a new task
+document.getElementById('addTaskBtn').addEventListener('click', function() {
+    const taskInput = document.getElementById('newTaskInput');
+    const taskDescription = taskInput.value.trim();
+    if (taskDescription) {
+        chrome.storage.local.get({tasks: []}, function(result) {
+            const tasks = result.tasks;
+            tasks.push({description: taskDescription, completed: false});
+            saveTasks(tasks);
+            taskInput.value = ''; // Clear input after adding
+        });
     } else {
         alert("Please enter a task!");
     }
+});
+
+// Load tasks on startup
+document.addEventListener('DOMContentLoaded', function() {
+    chrome.storage.local.get({tasks: []}, function(result) {
+        updateTaskListUI(result.tasks);
+    });
 });
 
 var speechUtterance = null;
@@ -131,21 +159,46 @@ function speakText(text, rate) {
 
 document.getElementById('addBlockedWebsiteBtn').addEventListener('click', function() {
     const input = document.getElementById('newBlockedWebsiteInput');
-    const list = document.getElementById('blockedWebsitesList');
     const website = input.value.trim();
     if (website) {
+        chrome.storage.local.get({blockedWebsites: []}, function(result) {
+            const blockedWebsites = result.blockedWebsites;
+            blockedWebsites.push(website);
+            chrome.storage.local.set({blockedWebsites: blockedWebsites}, function() {
+                updateBlockedWebsitesUI(blockedWebsites);
+                input.value = ''; // Clear input after adding
+            });
+        });
+    } else {
+        alert("Please enter a valid website URL!");
+    }
+});
+
+function updateBlockedWebsitesUI(blockedWebsites) {
+    const list = document.getElementById('blockedWebsitesList');
+    list.innerHTML = ''; // Clear current list
+    blockedWebsites.forEach(function(website) {
         const listItem = document.createElement('li');
         listItem.textContent = website;
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = 'Delete';
-        deleteBtn.classList.add('delete-website-btn');
         deleteBtn.onclick = function() {
-            list.removeChild(listItem);
+            const index = blockedWebsites.indexOf(website);
+            if (index > -1) {
+                blockedWebsites.splice(index, 1); // Remove from array
+                chrome.storage.local.set({blockedWebsites: blockedWebsites}, function() {
+                    updateBlockedWebsitesUI(blockedWebsites);
+                });
+            }
         };
         listItem.appendChild(deleteBtn);
         list.appendChild(listItem);
-        input.value = ''; // Clear input after adding
-    } else {
-        alert("Please enter a valid website URL!");
-    }
+    });
+}
+
+// Load blocked websites on startup
+document.addEventListener('DOMContentLoaded', function() {
+    chrome.storage.local.get({blockedWebsites: []}, function(result) {
+        updateBlockedWebsitesUI(result.blockedWebsites);
+    });
 });

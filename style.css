@@ -151,3 +151,16 @@ h1 {
     background-color: #f44336; /* Red background */
     color: white;
 }
+
+#timer {
+    font-size: 32px; /* Increased font size for better visibility */
+    margin-top: 20px; /* Increased spacing above the timer */
+    color: #d35400; /* Optional: change the color for better visibility or style */
+    font-weight: bold; /* Optional: make the timer digits bold */
+    padding: 10px; /* Optional: add padding around the text */
+    background-color: #f9f9f9; /* Optional: background color */
+    border-radius: 5px; /* Optional: rounded corners */
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.1); /* Optional: subtle shadow for depth */
+    width: auto; /* Adjust width as needed */
+    text-align: center; /* Center the timer text */
+}
