@@ -1,0 +1,37 @@
+{
+    "manifest_version": 3,
+    "name": "Focus Time",
+    "version": "1.0",
+    "description": "A tool that functions as a Pomodoro timer with notifications and a Text-To-Speech tool.",
+    "permissions": [
+      "alarms", 
+      "storage", 
+      "activeTab",
+      "notifications",
+      "tts",
+      "webNavigation",
+      "tabs"],
+    "web_accessible_resources": [
+      {
+        "resources": ["popup.html", "pomodoro.html"],
+        "matches": ["<all_urls>"]
+      }
+    ],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "action": {
+      "default_popup": "menu.html",
+      "default_icon": {
+        "16": "images/icon.png",
+        "48": "images/icon.png",
+        "128": "images/icon.png"
+      }
+    },
+    "icons": {
+      "16": "images/icon.png",
+      "48": "images/icon.png",
+      "128": "images/icon.png"
+    }
+  }
+  
