@@ -1,137 +1,163 @@
 /* General body styling */
 body {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Two columns of equal width */
-    grid-template-rows: 1fr 1fr; /* Two rows of equal height */
-    gap: 10px; /* Space between grid items */
-    height: 100vh; /* Full viewport height */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh; /* Full viewport height */
     margin: 0; /* No margin */
     font-family: 'Arial', sans-serif; /* Consistent font throughout the dashboard */
-    background-color: #f4f4f4; /* Light grey background */
+    background-color: var(--bg-color); /* Background color variable */
+    color: var(--text-color); /* Text color variable */
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition for theme change */
 }
 
-/* Styling for the Timer section */
-#timerContainer {
-    grid-area: 1 / 1 / 2 / 2; /* Top left quadrant */
-    padding: 10px;
-    background-color: #fff; /* White background for visibility */
-    border-radius: 8px; /* Rounded corners */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+/* Light mode variables */
+:root {
+    --bg-color: #f0f2f5;
+    --text-color: #000000;
+    --card-bg-color: #ffffff;
+    --button-bg-color: #007bff;
+    --button-hover-bg-color: #0056b3;
+    --input-bg-color: #ffffff;
+    --list-item-bg-color: #e9ecef;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --highlight-color: rgba(0, 123, 255, 0.1);
 }
 
-/* Styling for the Text to Speech section */
-#ttsContainer {
-    grid-area: 2 / 1 / 3 / 2; /* Bottom left quadrant */
-    padding: 10px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+/* Dark mode variables */
+body.dark-mode {
+    --bg-color: #1e1e1e;
+    --text-color: #ffffff;
+    --card-bg-color: #2c2c2c;
+    --button-bg-color: #3b82f6;
+    --button-hover-bg-color: #2563eb;
+    --input-bg-color: #2c2c2c;
+    --list-item-bg-color: #3b3b3b;
+    --shadow-color: rgba(255, 255, 255, 0.1);
+    --highlight-color: rgba(59, 130, 246, 0.1);
 }
 
-/* Styling for the Task Tracker section */
-#taskTrackerContainer {
-    grid-area: 1 / 2 / 2 / 3; /* Top right quadrant */
-    padding: 10px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+/* Container for all cards */
+.dashboard-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+}
+
+/* Card styling */
+.card {
+    background-color: var(--card-bg-color); /* Card background color */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 12px var(--shadow-color); /* Subtle shadow for depth */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    width: 300px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px var(--shadow-color);
+}
+
+/* Card icon styling */
+.card-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 20px;
+    transition: color 0.3s;
+}
+
+.card-icon.timer {
+    background: url('pngtimer.png') no-repeat center center;
+    background-size: contain;
+}
+
+.card-icon.blocked-websites {
+    background: url('pngblocked.png') no-repeat center center;
+    background-size: contain;
+}
+
+.card-icon.task-tracker {
+    background: url('pngtask.png') no-repeat center center;
+    background-size: contain;
+}
+
+.card-icon.tts {
+    background: url('pngegg.png') no-repeat center center;
+    background-size: contain;
 }
 
 /* Common input and button styling */
 .input-group, textarea, select, button {
     width: 100%; /* Full width */
-    margin: 5px 0; /* Margin for spacing */
-    padding: 8px; /* Padding for better touch */
+    margin: 10px 0; /* Margin for spacing */
+    padding: 10px; /* Padding for better touch */
     box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    background-color: var(--input-bg-color); /* Input background color */
+    color: var(--text-color); /* Input text color */
+    border: 1px solid var(--list-item-bg-color); /* Border color */
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
 /* Button styling */
 .btn, button {
     cursor: pointer; /* Pointer cursor on hover */
-    background-color: #4285f4; /* Google Blue */
+    background-color: var(--button-bg-color); /* Button background color */
     color: white; /* White text */
     border: none; /* No border */
-    border-radius: 4px; /* Rounded button corners */
+    border-radius: 5px; /* Rounded button corners */
+    padding: 10px;
+    font-size: 16px;
+    transition: background-color 0.3s;
 }
 
-/* Button hover effect */
 .btn:hover, button:hover {
-    background-color: #357ae8; /* Slightly darker blue on hover */
+    background-color: var(--button-hover-bg-color); /* Button hover background color */
 }
 
 /* Additional styling for lists in Task Tracker */
-#taskList {
+#taskList, #blockedWebsitesList {
     list-style-type: none; /* Remove bullet points */
     padding: 0; /* No padding */
 }
 
 /* List items styling */
-#taskList li {
-    padding: 5px; /* Padding inside list items */
-    margin-top: 2px; /* Spacing between list items */
-    background-color: #e8eaf6; /* Light blue background for list items */
-    border-radius: 4px; /* Rounded corners for list items */
+#taskList li, #blockedWebsitesList li {
+    padding: 10px; /* Padding inside list items */
+    margin-top: 5px; /* Spacing between list items */
+    background-color: var(--list-item-bg-color); /* List item background color */
+    border-radius: 5px; /* Rounded corners */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s;
 }
 
 h1 {
     text-align: center; /* Center alignment */
-    margin: 10px 0; /* Spacing around the title */
+    margin: 20px 0; /* Spacing around the title */
+    font-size: 24px;
 }
 
-/* Section Container with two internal sections */
+/* Grid container for sections */
 .section-container {
-    display: flex; /* Enable flexbox */
+    display: grid;
+    gap: 20px;
 }
 
-/* Internal sections within the timerContainer */
+/* Timer section and Blocked websites section */
 .timer-section, .blocked-websites-section {
-    flex: 1; /* Each section takes half the space */
-    padding: 10px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-}
-
-/* Styles for the blocked websites list */
-#blockedWebsitesList {
-    list-style-type: none; /* Remove bullet points */
-    padding: 0; /* No padding */
-    width: 100%; /* Full width */
-}
-
-#blockedWebsitesList li {
-    padding: 8px; /* Padding inside list items */
-    margin-top: 2px; /* Spacing between list items */
-    background-color: #e8eaf6; /* Light blue background for list items */
-    border-radius: 4px; /* Rounded corners for list items */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* Button next to each website for deletion */
-.delete-website-btn {
-    cursor: pointer;
-    background-color: #f44336; /* Red background */
-    color: white; /* White text */
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-}
-
-#taskList {
-    list-style-type: none; /* Remove bullet points */
-    padding: 0; /* No padding */
-    width: 100%; /* Full width */
-}
-
-#taskList li {
-    padding: 8px; /* Padding inside list items */
-    margin-top: 2px; /* Spacing between list items */
-    background-color: #e8eaf6; /* Light blue background for list items */
-    border-radius: 4px; /* Rounded corners for list items */
-    display: flex;
-    justify-content: space-between;
     align-items: center;
 }
 
@@ -139,28 +165,49 @@ h1 {
     cursor: pointer;
     padding: 5px 10px;
     margin-left: 10px;
-    border-radius: 4px;
+    border-radius: 5px;
+    border: none;
+    transition: background-color 0.3s;
 }
 
 .complete-btn {
-    background-color: #4CAF50; /* Green background */
+    background-color: #28a745; /* Green background */
     color: white;
 }
 
 .delete-task-btn {
-    background-color: #f44336; /* Red background */
+    background-color: #dc3545; /* Red background */
     color: white;
 }
 
 #timer {
-    font-size: 32px; /* Increased font size for better visibility */
+    font-size: 36px; /* Increased font size for better visibility */
     margin-top: 20px; /* Increased spacing above the timer */
-    color: #d35400; /* Optional: change the color for better visibility or style */
-    font-weight: bold; /* Optional: make the timer digits bold */
-    padding: 10px; /* Optional: add padding around the text */
-    background-color: #f9f9f9; /* Optional: background color */
-    border-radius: 5px; /* Optional: rounded corners */
-    box-shadow: 0px 4px 8px rgba(0,0,0,0.1); /* Optional: subtle shadow for depth */
+    color: #ff6347; /* Timer color */
+    font-weight: bold; /* Make the timer digits bold */
+    padding: 10px; /* Add padding around the text */
+    background-color: var(--card-bg-color); /* Timer background color */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 12px var(--shadow-color); /* Subtle shadow for depth */
     width: auto; /* Adjust width as needed */
     text-align: center; /* Center the timer text */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Toggle switch for dark mode */
+.dark-mode-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    padding: 10px;
+    border: none;
+    background-color: var(--button-bg-color);
+    color: white;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.dark-mode-toggle:hover {
+    background-color: var(--button-hover-bg-color);
 }
