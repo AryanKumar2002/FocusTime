@@ -9,37 +9,23 @@ function startTimer(duration, type) {
     clearInterval(countdownTimer);
     timeLeft = duration * 60; // Convert minutes to seconds
     timerType = type;
-    iteration = 0;
     countdownTimer = setInterval(() => {
-        iteration++;
-        console.log(iteration);
-        if (timeLeft > 0) {
-            console.log(timeLeft);
-            console.log(pause);
-            console.log(pause === "Pause");
-            console.log(iteration == 10);
-            if (iteration >= 10 && pause === "Pause") {
-                timeLeft--;
-                iteration = 0;
-            }
-            // Send a periodic update to the popup
+        if (timeLeft > 0 && !isPaused) {
+            timeLeft--;
             chrome.runtime.sendMessage({timeLeft: timeLeft, timerType: timerType, state: state, pause: pause});
-        } else {
+        } else if (timeLeft <= 0) {
             clearInterval(countdownTimer);
-            // Switch timer type and start the next timer
             timerType = timerType === "work" ? "break" : "work";
-            notifTitle = timerType === "work" ? "Work Time" : "Break Time";
-            notifText = timerType === "work" ? "Time to get back to work!" : "Time to take a break!";
+            let nextDuration = timerType === "work" ? duration : duration; // Adjust for different durations if needed
             chrome.notifications.create({
                 type: 'basic',
                 iconUrl: 'icon.png', // Path to the icon
-                title: notifTitle,
-                message: notifText
+                title: timerType === "work" ? "Work Time" : "Break Time",
+                message: timerType === "work" ? "Time to get back to work!" : "Time to take a break!"
             });
-            let nextDuration = timerType === "work" ? duration : duration; // Adjust this line to switch between different durations for work and break
             startTimer(nextDuration, timerType);
         }
-    }, 100);
+    }, 1000);
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -52,14 +38,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         clearInterval(countdownTimer);
         chrome.storage.local.set({isTimerRunning: false});
     } else if (request.request === "currentTimeLeft") {
-        // Respond with the current timer state
         sendResponse({timeLeft: timeLeft, timerType: timerType});
     } else if (request.action === "pause") {
         pause = "Play";
+        isPaused = true;
         chrome.storage.local.set({isPaused: true});
     } else if (request.action === "play") {
         pause = "Pause";
-        chrome.storage.local.set({isPaused: false});  
+        isPaused = false;
+        chrome.storage.local.set({isPaused: false});
     }
 });
 
@@ -74,7 +61,6 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
             const blockedWebsites = result.blockedWebsites;
             blockedWebsites.forEach(function(blockedUrl) {
                 if (tab.url.includes(blockedUrl) && state == "Stop" && pause == "Pause") {
-                    console.log("Blocked website accessed:", blockedUrl);
                     chrome.notifications.create({
                         type: 'basic',
                         iconUrl: 'icon.png',
