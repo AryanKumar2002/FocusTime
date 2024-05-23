@@ -5,50 +5,25 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-    <div id="timerContainer" class="section-container">
-        <div class="timer-section">
+    <button class="dark-mode-toggle" id="darkModeToggle">Dark Mode</button>
+
+    <div class="dashboard-container">
+        <div id="timerCard" class="card">
+            <div class="card-icon timer"></div>
             <h1>Pomodoro Timer</h1>
-            <div class="input-group">
-                <label for="workTime">Work Time (minutes):</label>
-                <input type="number" id="workTime" min="1" value="20">
-            </div>
-            <div class="input-group">
-                <label for="breakTime">Break Time (minutes):</label>
-                <input type="number" id="breakTime" min="1" value="5">
-            </div>
-            <button id="startStopBtn" class="btn">Start</button>
-            <button id="playPauseBtn" class="btn pause-play">Pause</button>
-            <div id="timer">00:00:00</div>
         </div>
-        <div class="blocked-websites-section">
+        <div id="blockedWebsitesCard" class="card">
+            <div class="card-icon blocked-websites"></div>
             <h1>Blocked Websites</h1>
-            <input type="text" id="newBlockedWebsiteInput" placeholder="Enter website URL">
-            <button id="addBlockedWebsiteBtn" class="btn">Add</button>
-            <ul id="blockedWebsitesList"></ul>
         </div>
-    </div>
-
-    <div id="ttsContainer" class="bottom-left">
-        <!-- Text to Speech content goes here -->
-        <h1>Text to Speech</h1>
-        <textarea id="text-to-speak" placeholder="Enter text..."></textarea>
-        <button id="speak">Speak</button>
-        <select id="speed">
-            <option value="0.5">0.5x</option>
-            <option value="0.75">0.75x</option>
-            <option value="1.0" selected>Normal</option>
-            <option value="1.25">1.25x</option>
-            <option value="1.5">1.5x</option>
-        </select>
-        <button id="pause">Stop</button>
-    </div>
-
-    <div id="taskTrackerContainer" class="top-right">
-        <!-- Task Tracker content goes here -->
-        <h1>Task Tracker</h1>
-        <input type="text" id="newTaskInput" placeholder="Enter new task">
-        <button id="addTaskBtn">Add Task</button>
-        <ul id="taskList"></ul>
+        <div id="taskTrackerCard" class="card">
+            <div class="card-icon task-tracker"></div>
+            <h1>Task Tracker</h1>
+        </div>
+        <div id="ttsCard" class="card">
+            <div class="card-icon tts"></div>
+            <h1>Text to Speech</h1>
+        </div>
     </div>
 
     <script src="dashboard.js"></script>
