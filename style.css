@@ -200,14 +200,98 @@ h1 {
     top: 20px;
     right: 20px;
     cursor: pointer;
-    padding: 10px;
+    padding: 10px 20px;
     border: none;
     background-color: var(--button-bg-color);
     color: white;
     border-radius: 5px;
+    z-index: 1000;
     transition: background-color 0.3s;
+    width: auto;
+    height: auto;
 }
 
 .dark-mode-toggle:hover {
     background-color: var(--button-hover-bg-color);
+}
+
+.opened-cards-container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.icon-btn {
+    background-color: var(--button-bg-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 0;
+    transition: background-color 0.3s;
+    margin-left: 10px;
+}
+
+.icon-btn.delete {
+    background-color: #dc3545; /* Red color */
+}
+
+.icon-btn.complete {
+    background-color: #28a745; /* Green color */
+}
+
+.icon-btn:hover {
+    background-color: var(--button-hover-bg-color);
+}
+
+.icon-btn.delete:hover {
+    background-color: #c82333; /* Darker red on hover */
+}
+
+.icon-btn.complete:hover {
+    background-color: #218838; /* Darker green on hover */
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    width: calc(100% - 40px); /* Adjust width for padding */
+    margin-left: 20px; /* Consistent padding on left */
+    margin-right: 20px; /* Consistent padding on right */
+}
+
+.input-group input {
+    flex-grow: 1;
+    padding: 10px;
+    font-size: 14px;
+}
+
+#blockedWebsitesList li, #taskList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-top: 5px;
+    background-color: var(--list-item-bg-color);
+    border-radius: 5px;
+    width: calc(100% - 40px); /* Adjust width for padding */
+    margin-left: 20px; /* Consistent padding on left */
+    margin-right: 20px; /* Consistent padding on right */
+}
+
+.button-group {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+}
+
+#blockedWebsitesList, #taskList {
+    width: 100%; /* Full width for the list */
 }

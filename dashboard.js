@@ -4,33 +4,56 @@ document.addEventListener('DOMContentLoaded', function() {
     const blockedWebsitesCard = document.getElementById('blockedWebsitesCard');
     const taskTrackerCard = document.getElementById('taskTrackerCard');
     const ttsCard = document.getElementById('ttsCard');
+    const body = document.body;
+
+    const cardContainers = {
+        timerCard: null,
+        blockedWebsitesCard: null,
+        taskTrackerCard: null,
+        ttsCard: null
+    };
+
+    const openedCardsContainer = document.createElement('div');
+    openedCardsContainer.className = 'opened-cards-container';
+    body.appendChild(openedCardsContainer);
 
     darkModeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        chrome.storage.local.set({ darkMode: document.body.classList.contains('dark-mode') });
+        body.classList.toggle('dark-mode');
+        chrome.storage.local.set({ darkMode: body.classList.contains('dark-mode') });
     });
 
     chrome.storage.local.get('darkMode', (data) => {
         if (data.darkMode) {
-            document.body.classList.add('dark-mode');
+            body.classList.add('dark-mode');
         }
     });
 
     timerCard.addEventListener('click', () => {
-        openTimer();
+        toggleCard('timerCard', openTimer);
     });
 
     blockedWebsitesCard.addEventListener('click', () => {
-        openBlockedWebsites();
+        toggleCard('blockedWebsitesCard', openBlockedWebsites);
     });
 
     taskTrackerCard.addEventListener('click', () => {
-        openTaskTracker();
+        toggleCard('taskTrackerCard', openTaskTracker);
     });
 
     ttsCard.addEventListener('click', () => {
-        openTTS();
+        toggleCard('ttsCard', openTTS);
     });
+
+    function toggleCard(cardName, openFunction) {
+        if (cardContainers[cardName]) {
+            openedCardsContainer.removeChild(cardContainers[cardName]);
+            cardContainers[cardName] = null;
+        } else {
+            const container = openFunction();
+            cardContainers[cardName] = container;
+            openedCardsContainer.appendChild(container);
+        }
+    }
 
     function openTimer() {
         const container = document.createElement('div');
@@ -49,7 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
             <button id="playPauseBtn" class="btn pause-play">Pause</button>
             <div id="timer">00:00:00</div>
         `;
-        document.body.appendChild(container);
         const startStopBtn = container.querySelector('#startStopBtn');
         const pausePlayBtn = container.querySelector('#playPauseBtn');
         const workTimeInput = container.querySelector('#workTime');
@@ -62,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
             pausePlayBtn.textContent = pause;
         }
 
-        chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+        chrome.runtime.onMessage.addListener(function(message) {
             if (message.timeLeft !== undefined && message.timerType) {
                 const minutes = Math.floor(message.timeLeft / 60);
                 const seconds = message.timeLeft % 60;
@@ -73,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
         startStopBtn.addEventListener('click', () => {
             chrome.storage.local.get('isTimerRunning', (data) => {
                 if (data.isTimerRunning) {
-                    chrome.runtime.sendMessage({action: "stop"});
+                    chrome.runtime.sendMessage({ action: "stop" });
                     startStopBtn.textContent = "Start";
                     workTimeInput.disabled = false;
                     breakTimeInput.disabled = false;
@@ -95,19 +117,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.isTimerRunning) {
                     chrome.storage.local.get('isPaused', (data2) => {
                         if (data2.isPaused) {
-                            chrome.runtime.sendMessage({action: "play"});
+                            chrome.runtime.sendMessage({ action: "play" });
                             pausePlayBtn.textContent = "Pause";
                         } else {
-                            chrome.runtime.sendMessage({action: "pause"});
+                            chrome.runtime.sendMessage({ action: "pause" });
                             pausePlayBtn.textContent = "Play";
                         }
                     });
-                    chrome.runtime.sendMessage({action: "pause"});
                 }
             });
         });
 
-        chrome.runtime.sendMessage({request: "currentTimeLeft"});
+        chrome.runtime.sendMessage({ request: "currentTimeLeft" });
+
+        return container;
     }
 
     function openBlockedWebsites() {
@@ -115,11 +138,12 @@ document.addEventListener('DOMContentLoaded', function() {
         container.classList.add('card');
         container.innerHTML = `
             <h1>Blocked Websites</h1>
-            <input type="text" id="newBlockedWebsiteInput" placeholder="Enter website URL" class="input-group">
-            <button id="addBlockedWebsiteBtn" class="btn">Add</button>
+            <div class="input-group">
+                <input type="text" id="newBlockedWebsiteInput" placeholder="Enter website URL">
+                <button id="addBlockedWebsiteBtn" class="icon-btn">+</button>
+            </div>
             <ul id="blockedWebsitesList"></ul>
         `;
-        document.body.appendChild(container);
         const input = container.querySelector('#newBlockedWebsiteInput');
         const addBlockedWebsiteBtn = container.querySelector('#addBlockedWebsiteBtn');
         const blockedWebsitesList = container.querySelector('#blockedWebsitesList');
@@ -127,10 +151,10 @@ document.addEventListener('DOMContentLoaded', function() {
         addBlockedWebsiteBtn.addEventListener('click', () => {
             const website = input.value.trim();
             if (website) {
-                chrome.storage.local.get({blockedWebsites: []}, function(result) {
+                chrome.storage.local.get({ blockedWebsites: [] }, function(result) {
                     const blockedWebsites = result.blockedWebsites;
                     blockedWebsites.push(website);
-                    chrome.storage.local.set({blockedWebsites: blockedWebsites}, function() {
+                    chrome.storage.local.set({ blockedWebsites: blockedWebsites }, function() {
                         updateBlockedWebsitesUI(blockedWebsites);
                         input.value = ''; // Clear input after adding
                     });
@@ -145,26 +169,31 @@ document.addEventListener('DOMContentLoaded', function() {
             blockedWebsites.forEach(function(website) {
                 const listItem = document.createElement('li');
                 listItem.textContent = website;
+                const buttonGroup = document.createElement('div');
+                buttonGroup.classList.add('button-group');
                 const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Delete';
-                deleteBtn.classList.add('delete-website-btn');
+                deleteBtn.classList.add('icon-btn', 'delete');
+                deleteBtn.textContent = 'X';
                 deleteBtn.onclick = function() {
                     const index = blockedWebsites.indexOf(website);
                     if (index > -1) {
                         blockedWebsites.splice(index, 1); // Remove from array
-                        chrome.storage.local.set({blockedWebsites: blockedWebsites}, function() {
+                        chrome.storage.local.set({ blockedWebsites: blockedWebsites }, function() {
                             updateBlockedWebsitesUI(blockedWebsites);
                         });
                     }
                 };
-                listItem.appendChild(deleteBtn);
+                buttonGroup.appendChild(deleteBtn);
+                listItem.appendChild(buttonGroup);
                 blockedWebsitesList.appendChild(listItem);
             });
         }
 
-        chrome.storage.local.get({blockedWebsites: []}, function(result) {
+        chrome.storage.local.get({ blockedWebsites: [] }, function(result) {
             updateBlockedWebsitesUI(result.blockedWebsites);
         });
+
+        return container;
     }
 
     function openTaskTracker() {
@@ -172,11 +201,12 @@ document.addEventListener('DOMContentLoaded', function() {
         container.classList.add('card');
         container.innerHTML = `
             <h1>Task Tracker</h1>
-            <input type="text" id="newTaskInput" class="input-group" placeholder="Enter new task">
-            <button id="addTaskBtn" class="btn">Add Task</button>
+            <div class="input-group">
+                <input type="text" id="newTaskInput" placeholder="Enter new task">
+                <button id="addTaskBtn" class="icon-btn">+</button>
+            </div>
             <ul id="taskList"></ul>
         `;
-        document.body.appendChild(container);
         const taskInput = container.querySelector('#newTaskInput');
         const addTaskBtn = container.querySelector('#addTaskBtn');
         const taskList = container.querySelector('#taskList');
@@ -184,9 +214,9 @@ document.addEventListener('DOMContentLoaded', function() {
         addTaskBtn.addEventListener('click', function() {
             const taskDescription = taskInput.value.trim();
             if (taskDescription) {
-                chrome.storage.local.get({tasks: []}, function(result) {
+                chrome.storage.local.get({ tasks: [] }, function(result) {
                     const tasks = result.tasks;
-                    tasks.push({description: taskDescription, completed: false});
+                    tasks.push({ description: taskDescription, completed: false });
                     saveTasks(tasks);
                     taskInput.value = ''; // Clear input after adding
                 });
@@ -201,28 +231,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 const listItem = document.createElement('li');
                 listItem.textContent = task.description;
                 listItem.style.textDecoration = task.completed ? 'line-through' : 'none';
-
+        
                 // Button to toggle completion status
+                const buttonGroup = document.createElement('div');
+                buttonGroup.classList.add('button-group');
                 const completeBtn = document.createElement('button');
-                completeBtn.textContent = task.completed ? 'Undo' : 'Complete';
-                completeBtn.classList.add('complete-btn');
+                completeBtn.classList.add('icon-btn', 'complete');
+                completeBtn.textContent = 'O';
                 completeBtn.onclick = function() {
                     task.completed = !task.completed;
                     saveTasks(tasks);
                 };
-
+        
                 // Button to delete task
                 const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Delete';
-                deleteBtn.classList.add('delete-task-btn');
+                deleteBtn.classList.add('icon-btn', 'delete');
+                deleteBtn.textContent = 'X';
                 deleteBtn.onclick = function() {
                     const index = tasks.indexOf(task);
                     tasks.splice(index, 1);
                     saveTasks(tasks);
                 };
-
-                listItem.appendChild(completeBtn);
-                listItem.appendChild(deleteBtn);
+        
+                buttonGroup.appendChild(completeBtn);
+                buttonGroup.appendChild(deleteBtn);
+                listItem.appendChild(buttonGroup);
                 taskList.appendChild(listItem);
             });
         }
@@ -233,9 +266,11 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        chrome.storage.local.get({tasks: []}, function(result) {
+        chrome.storage.local.get({ tasks: [] }, function(result) {
             updateTaskListUI(result.tasks);
         });
+
+        return container;
     }
 
     function openTTS() {
@@ -254,20 +289,19 @@ document.addEventListener('DOMContentLoaded', function() {
             </select>
             <button id="pause" class="btn">Stop</button>
         `;
-        document.body.appendChild(container);
         const speakBtn = container.querySelector('#speak');
         const pauseBtn = container.querySelector('#pause');
         const textToSpeak = container.querySelector('#text-to-speak');
         const speed = container.querySelector('#speed');
         let speechUtterance = null;
 
-        speakBtn.addEventListener('click', function () {
+        speakBtn.addEventListener('click', function() {
             const text = textToSpeak.value;
             const rate = parseFloat(speed.value);
             speakText(text, rate);
         });
 
-        pauseBtn.addEventListener('click', function () {
+        pauseBtn.addEventListener('click', function() {
             if (speechUtterance) {
                 if (speechUtterance.paused) {
                     chrome.tts.resume();
@@ -291,5 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 'rate': rate
             });
         }
+
+        return container;
     }
 });
